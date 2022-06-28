@@ -7,7 +7,7 @@ Skriver ned anteckningar och lägger till dem i fastnotes-modulen
 ## Examples
 * "Skriv upp att jag ska köpa mjölk"
 * "Anteckna 070-1234-123"
-* "Skriv ned avatt jag har skostorlek 45"
+* "Skriv ned att jag har skostorlek 45"
 
 ## Credits
 Christoffer Eid
@@ -25,4 +25,3 @@ Daily
 #Post-it
 #Anteckningar
 #Anteckning
-
