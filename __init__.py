@@ -1,5 +1,6 @@
 from tkinter import N
 from mycroft import MycroftSkill, intent_handler
+from mycroft.messagebus import Message
 from pathlib import Path 
 import os
 import sys
@@ -8,13 +9,13 @@ DB_DIR = os.path.join(
 sys.path.append(DB_DIR)
 from database import Database
 
-YES = ('yes', 'ja')
-NO  = ('no', 'nej')
-
 class Fastnotes(MycroftSkill):
     def __init__(self):
         MycroftSkill.__init__(self)
         self.db = Database()
+        
+    def notify_mirror(self):
+        self.bus.emit(Message("RELAY:MMM-FastNotes:DB-UPDATED"))
 
     # When the utterance is complete.
     # E.g. 'Hey Mycroft, jot down that I should buy bananas'. (note: 'I should buy bananas')
@@ -23,8 +24,10 @@ class Fastnotes(MycroftSkill):
         note = message.data.get('note', None)
         if note is None:    # Make sure there's a note.
             return self.unspecified_note(message)
-        self.speak_dialog("note.taken")
         self.db.create_post(note)
+        self.speak_dialog("note.taken")
+        return self.notify_mirror()
+        
 
     # When the utterance is missing a note.
     # E.g: 'Hey Mycroft, take a note'. 
@@ -35,21 +38,20 @@ class Fastnotes(MycroftSkill):
             return self.take_note(message)
         note = self.get_response('what.should.i.jot')
         if note is not None: 
-            self.speak_dialog('note.taken')
             self.db.create_post(note)
+            self.speak_dialog('note.taken')
+            return self.notify_mirror()
         else:
             self.speak_dialog('something.went.wrong')
 
     @intent_handler('clear.notepad.intent')
     def clear_notepad(self, message):
-        is_sure = self.ask_yesno('are.you.sure')
-        if is_sure in YES:
-            self.speak_dialog('notepad.cleared')
+        if self.ask_yesno('are.you.sure') == 'yes':
             self.db.delete_all_posts()
-        elif is_sure in NO:
-            self.speak_dialog('notepad.not.cleared')
+            self.speak_dialog('notepad.cleared')
+            return self.notify_mirror()
         else:
-            self.speak_dialog('could.not.understand')
+            self.speak_dialog('notepad.not.cleared')
 
 def create_skill():
     return Fastnotes()
