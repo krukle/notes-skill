@@ -61,12 +61,23 @@ class Database:
         conn.close()
         return post
 
-    def create_post(self, content:str):
+    def create_post(self, content:str) -> "tuple[int, str, str]":
+        """Create a post and return it.
+
+        Returns:
+            int: id
+            str: date created
+            str: content
+        """
         conn = self._get_connection()
-        conn.execute('INSERT INTO posts (content) VALUES (?)',
+        curs = conn.cursor()
+        curs.execute('INSERT INTO posts (content) VALUES (?)',
                      (content, ))
+        post = curs.execute('SELECT * FROM posts WHERE id = ?', 
+                            (curs.lastrowid, )).fetchone()
         conn.commit()
         conn.close()
+        return post
 
     def edit_post(self, content:str, post_id:int):
         conn = self._get_connection()

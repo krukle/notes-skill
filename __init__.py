@@ -8,20 +8,15 @@ class Fastnotes(MycroftSkill):
         self.db = Database()
         
     def initialize(self):
-        self.log.info("0")
         self.add_event("fastnotes-skill:get_all_posts", self.handle_get_all_posts)
     
     def handle_get_all_posts(self, message):
-        self.log.info(("HEJ!", message, type(message)))
-        temp = self.db.get_all_posts()
-        self.transmit_posts(temp)
-        self.log.info(temp)
+        self.transmit_posts(self.db.get_all_posts())
     
-    def transmit_post(self, post:str):
-        self.log.info(("HEJ", post, type(post)))
+    def transmit_post(self, post:"tuple[int, str, str]"):
         self.bus.emit(Message("RELAY:MMM-FastNotes:NEW-POST", {"post": post}))
         
-    def transmit_posts(self, posts:"list[str]"):
+    def transmit_posts(self, posts:"list[tuple[int, str, str]]"):
         self.bus.emit(Message("RELAY:MMM-FastNotes:ALL-POSTS", {"posts": posts}))
         
     def notify_delete_all_posts(self):
@@ -34,9 +29,8 @@ class Fastnotes(MycroftSkill):
         note = message.data.get('note', None)
         if note is None:    # Make sure there's a note.
             return self.unspecified_note(message)
-        self.db.create_post(note)
         self.speak_dialog("note.taken")
-        return self.transmit_post(note)
+        return self.transmit_post(self.db.create_post(note))
         
 
     # When the utterance is missing a note.
@@ -48,9 +42,8 @@ class Fastnotes(MycroftSkill):
             return self.take_note(message)
         note = self.get_response('what.should.i.jot')
         if note is not None: 
-            self.db.create_post(note)
             self.speak_dialog('note.taken')
-            return self.transmit_post(note)
+            return self.transmit_post(self.db.create_post(note))
         else:
             self.speak_dialog('something.went.wrong')
 
