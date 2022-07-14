@@ -4,7 +4,7 @@ import sqlite3
 
 class Database:
     def __init__(self):
-        self.database_path = Path(Path.home(), 'mycroft-core', 'database', 'fastnotes-skill', 'database.db')
+        self.database_path = Path(Path.home(), 'mycroft-core', 'database', 'notes-skill', 'database.db')
         self.database_path.parent.mkdir(parents=True, exist_ok=True)
         self.schema_path = f'{os.path.dirname(os.path.realpath(__file__))}{os.sep}schema.sql'
         try:
