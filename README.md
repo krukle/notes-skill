@@ -1,16 +1,11 @@
-# <img src="https://raw.githack.com/FortAwesome/Font-Awesome/master/svgs/solid/sticky-note.svg" card_color="#FEE255" width="50" height="50" style="vertical-align:bottom"/> Fastnotes
-Skriver ned anteckningar
+# <img src="https://raw.githack.com/FortAwesome/Font-Awesome/master/svgs/solid/sticky-note.svg" card_color="#FEE255" width="50" height="50" style="vertical-align:bottom"/> Notes
+Takes notes
 
 ## About
-Skriver ned anteckningar och lägger till dem i fastnotes-modulen
-
-## Examples
-* "Skriv upp att jag ska köpa mjölk"
-* "Anteckna 070-1234-123"
-* "Skriv ned att jag har skostorlek 45"
+Takes notes and adds them to MMM-Notes module.
 
 ## Credits
-Christoffer Eid
+Christoffer Eid **krukle**
 
 ## Category
 **Productivity**
