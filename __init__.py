@@ -2,25 +2,25 @@ from mycroft import MycroftSkill, intent_handler
 from mycroft.messagebus import Message
 from .database.database import Database
 
-class Fastnotes(MycroftSkill):
+class Notes(MycroftSkill):
     def __init__(self):
         MycroftSkill.__init__(self)
         self.db = Database()
         
     def initialize(self):
-        self.add_event("fastnotes-skill:get_all_posts", self.handle_get_all_posts)
+        self.add_event("notes-skill:get_all_posts", self.handle_get_all_posts)
     
     def handle_get_all_posts(self, message):
         self.transmit_posts(self.db.get_all_posts())
     
     def transmit_post(self, post:"tuple[int, str, str]"):
-        self.bus.emit(Message("RELAY:MMM-FastNotes:NEW-POST", {"post": post}))
+        self.bus.emit(Message("RELAY:MMM-Notes:NEW-POST", {"post": post}))
         
     def transmit_posts(self, posts:"list[tuple[int, str, str]]"):
-        self.bus.emit(Message("RELAY:MMM-FastNotes:ALL-POSTS", {"posts": posts}))
+        self.bus.emit(Message("RELAY:MMM-Notes:ALL-POSTS", {"posts": posts}))
         
     def notify_delete_all_posts(self):
-        self.bus.emit(Message("RELAY:MMM-FastNotes:DELETE-POSTS"))
+        self.bus.emit(Message("RELAY:MMM-Notes:DELETE-POSTS"))
 
     # When the utterance is complete.
     # E.g. 'Hey Mycroft, jot down that I should buy bananas'. (note: 'I should buy bananas')
@@ -57,4 +57,4 @@ class Fastnotes(MycroftSkill):
             self.speak_dialog('notepad.not.cleared')
 
 def create_skill():
-    return Fastnotes()
+    return Notes()
