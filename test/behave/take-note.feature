@@ -3,7 +3,7 @@ Feature: take-note
   Scenario Outline: Take note in Swedish
     Given an english speaking user 
       When the user says "<Swedish prompt with note>"
-      Then "fastnotes-skill" should reply with dialog from "note.taken.dialog"
+      Then "notes-skill" should reply with dialog from "note.taken.dialog"
 
   Examples: Swedish prompts with notes
         | Swedish prompt with note                       |
@@ -16,7 +16,7 @@ Feature: take-note
   # Scenario Outline: Take note in English
   #   Given an english speaking user
   #     When the user says "<English prompt with note>"
-  #     Then "fastnotes-skill" should reply with dialog from "note.taken.dialog"
+  #     Then "notes-skill" should reply with dialog from "note.taken.dialog"
 
   # Examples: English promps with notes
   #       | English prompt with note                          |
