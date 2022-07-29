@@ -1,3 +1,5 @@
+from os import remove
+import re
 from mycroft import MycroftSkill, intent_handler
 from mycroft.messagebus import Message
 from .database.database import Database
@@ -41,18 +43,32 @@ class Notes(MycroftSkill):
         Notify the MMM-Notes module to delete all posts.
         """
         self.bus.emit(Message("RELAY:MMM-Notes:DELETE-POSTS"))
+        
+    def notify_delete_post(self, id:int):
+        self.bus.emit(Message("RELAY:MMM-Notes:DELETE-POST", {"id": id}))
+
+    def delete_note(self, id:int):
+        """
+        Delete a note from the database. If the note does not exist, notify the user that it does not exist.
+        @param id - the id of the note to delete
+        """    
+        if self.db.delete_post(id):
+            self.speak_dialog('note.removed', {'note_id': id})
+            self.notify_delete_post(id)
+        else:
+            self.speak_dialog('note.does.not.exist', {'note_id': id})
 
     # When the utterance is complete.
     # E.g. 'Hey Mycroft, jot down that I should buy bananas'. (note: 'I should buy bananas')
     @intent_handler('take.note.that.intent')
-    def take_note(self, message):
+    def take_note_intent(self, message):
         """
         This function is called when the user asks for a note and specifies the note. It will take the note and store it in the database.
         @param message - the message containing the note
         """
         note = message.data.get('note', None)
         if note is None:  
-            return self.unspecified_note(message)
+            return self.unspecified_note_intent(message)
         self.speak_dialog("note.taken")
         return self.transmit_post(self.db.create_post(note))
         
@@ -60,7 +76,7 @@ class Notes(MycroftSkill):
     # When the utterance is missing a note.
     # E.g: 'Hey Mycroft, take a note'. 
     @intent_handler('take.note.intent')
-    def unspecified_note(self, message):
+    def unspecified_note_intent(self, message):
         """
         This function is called when the user asks for a note without specifying the note. It will take the note and store it in the database.
         @param message - the message not containing the note
@@ -68,16 +84,27 @@ class Notes(MycroftSkill):
         """
         note = message.data.get('note', None)
         if note is not None:    # Make sure there's no note.
-            return self.take_note(message)
+            return self.take_note_intent(message)
         note = self.get_response('what.should.i.jot')
         if note is not None: 
             self.speak_dialog('note.taken')
             return self.transmit_post(self.db.create_post(note))
         else:
             self.speak_dialog('something.went.wrong')
-
+            
+    @intent_handler('delete.note.intent')
+    def delete_note_intent(self, message):
+        """
+        Delete a note from the database.
+        @param note_id - the note id to delete
+        """
+        note_id = message.data.get('note_id', None)
+        if note_id is None:
+            note_id = int(re.search('\d', self.get_response('which.note.should.i.delete', validator=lambda response: re.search('\d', response))).group())
+        self.delete_note(note_id)
+            
     @intent_handler('clear.notepad.intent')
-    def clear_notepad(self, message):
+    def clear_notepad_intent(self, message):
         """
         This function is called when the user asks to clear the notepad. Asks for user confirmation and clears the notepad.
         """

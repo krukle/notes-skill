@@ -4,6 +4,9 @@ import sqlite3
 
 class Database:
     def __init__(self):
+        """
+        Initialize the database. If the database does not exist, create it and create the necessary tables.
+        """
         self.database_path = Path(Path.home(), 'mycroft-core', 'database', 'notes-skill', 'database.db')
         self.database_path.parent.mkdir(parents=True, exist_ok=True)
         self.schema_path = f'{os.path.dirname(os.path.realpath(__file__))}{os.sep}schema.sql'
@@ -80,6 +83,11 @@ class Database:
         return post
 
     def edit_post(self, content:str, post_id:int):
+        """
+        Edit the content of a post given the post id.
+        @param content - the new content for the post
+        @param post_id - the id of the post to edit
+        """
         conn = self._get_connection()
         conn.execute('UPDATE posts SET content = ? WHERE id = ?',
                      (content, post_id))
@@ -87,16 +95,26 @@ class Database:
         conn.close()
 
     def delete_all_posts(self):
+        """
+        Delete all posts from the database.
+        """
         conn = self._get_connection()
         conn.execute('DELETE FROM posts')
         conn.commit()
         conn.close()
 
     def delete_post(self, post_id:int):
+        """
+        Delete a post from the database.
+        @param post_id - the id of the post to delete
+        @returns True if the post was deleted, False otherwise
+        """
         conn = self._get_connection()
-        conn.execute('DELETE FROM posts WHERE id = ?', (post_id, ))
+        curs = conn.cursor()
+        curs.execute('DELETE FROM posts WHERE id = ?', (post_id, ))
         conn.commit()
         conn.close()
+        return curs.rowcount == 1
 
 if __name__ == '__main__':
     db = Database()
