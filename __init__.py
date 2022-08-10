@@ -14,10 +14,11 @@ class Notes(MycroftSkill):
         
     def initialize(self):
         """
-        This is called when the skill is first loaded. Subscribe to MMM-Notes notification to fetch all posts from database.
+        This is called when the skill is first loaded. Subscribe to MMM-Notes notification to fetch all posts from database and send all notes.
         """
         self.add_event("notes-skill:get_all_posts", self.handle_get_all_posts)
-    
+        self.transmit_posts(self.db.get_all_posts())
+        
     def handle_get_all_posts(self, message):
         """
         Handle the get all posts message. Retrieve all posts from the database and transmit them.
