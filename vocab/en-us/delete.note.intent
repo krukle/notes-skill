@@ -1,1 +1,1 @@
-(delete|remove)(note)(with|){note_id}
+(delete|remove)(note)(with id|with number|number|){note_id}
