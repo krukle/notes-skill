@@ -1,4 +1,3 @@
-from os import remove
 import re
 from mycroft import MycroftSkill, intent_handler
 from mycroft.messagebus import Message
